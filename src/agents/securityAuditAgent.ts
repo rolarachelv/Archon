@@ -36,6 +36,7 @@ export function computeRecommendation(
   if (hasCritical || hasHigh) return "REQUEST_CHANGES";
   const hasMedium = findings.some((f) => f.severity === "medium");
   if (hasMedium) return "NEEDS_DISCUSSION";
+  // Only approve if there are zero findings of medium or above
   return "APPROVE";
 }
 
@@ -82,7 +83,13 @@ export function formatAuditReport(result: SecurityAuditResult): string {
     "### Findings",
   ];
 
-  for (const f of findings) {
+  // Sort findings by severity so critical issues appear first in the report
+  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+  const sortedFindings = [...findings].sort(
+    (a, b) => severityOrder[a.severity] - severityOrder[b.severity]
+  );
+
+  for (const f of sortedFindings) {
     const autoTag = f.autoFixable ? "[AUTO-FIXABLE]" : "[MANUAL REVIEW REQUIRED]";
     lines.push("");
     lines.push(`#### [${f.severity.toUpperCase()}] ${f.title} ${autoTag}`);
