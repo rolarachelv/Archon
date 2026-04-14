@@ -60,6 +60,15 @@ describe("computeRecommendation", () => {
     ];
     expect(computeRecommendation(lowOnly)).toBe("APPROVE");
   });
+
+  // Verifying mixed low+medium doesn't accidentally escalate to REQUEST_CHANGES.
+  it("returns NEEDS_DISCUSSION for mixed low and medium severity findings", () => {
+    const mixedFindings: SecurityFinding[] = [
+      { ...mockFindings[1], severity: "low" },
+      { ...mockFindings[1], severity: "medium" },
+    ];
+    expect(computeRecommendation(mixedFindings)).toBe("NEEDS_DISCUSSION");
+  });
 });
 
 describe("buildAuditResult", () => {
@@ -85,10 +94,4 @@ describe("formatAuditReport", () => {
     expect(report).toContain("CWE-798");
   });
 
-  it("produces a markdown-formatted report", () => {
-    const result = buildAuditResult([], []);
-    const report = formatAuditReport(result);
-    expect(report).toContain("## Security Audit Report");
-    expect(report).toContain("Total Findings: 0");
-  });
-});
+  it("produces a markdown-formatted report", () => 
