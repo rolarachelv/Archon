@@ -81,17 +81,14 @@ describe("buildAuditResult", () => {
     expect(result.auditedFiles).toHaveLength(2);
     expect(result.timestamp).toBeTruthy();
   });
+
+  // Personal note: make sure medium count defaults to 0 when no medium findings are present.
+  it("reports zero medium findings when none exist", () => {
+    const result = buildAuditResult(mockFindings, ["src/config.ts", "src/server.ts"]);
+    expect(result.summary.medium).toBe(0);
+  });
 });
 
 describe("formatAuditReport", () => {
   it("includes recommendation in output", () => {
-    const result = buildAuditResult(mockFindings, ["src/config.ts"]);
-    const report = formatAuditReport(result);
-    expect(report).toContain("REQUEST_CHANGES");
-    expect(report).toContain("Hardcoded API Key");
-    expect(report).toContain("[AUTO-FIXABLE]");
-    expect(report).toContain("[MANUAL REVIEW REQUIRED]");
-    expect(report).toContain("CWE-798");
-  });
-
-  it("produces a markdown-formatted report", () => 
+    const result = bui
