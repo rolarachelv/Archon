@@ -51,6 +51,15 @@ describe("computeRecommendation", () => {
     ];
     expect(computeRecommendation(criticalFinding)).toBe("REQUEST_CHANGES");
   });
+
+  // Personal note: also verify that low-only findings still result in APPROVE,
+  // since low severity shouldn't block a merge on its own.
+  it("returns APPROVE when only low severity findings exist", () => {
+    const lowOnly: SecurityFinding[] = [
+      { ...mockFindings[1], severity: "low" },
+    ];
+    expect(computeRecommendation(lowOnly)).toBe("APPROVE");
+  });
 });
 
 describe("buildAuditResult", () => {
