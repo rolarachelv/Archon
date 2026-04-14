@@ -83,12 +83,14 @@ describe("buildAuditResult", () => {
   });
 
   // Personal note: make sure medium count defaults to 0 when no medium findings are present.
-  it("reports zero medium findings when none exist", () => {
+  it("reports zero medium findings when none are present", () => {
     const result = buildAuditResult(mockFindings, ["src/config.ts", "src/server.ts"]);
     expect(result.summary.medium).toBe(0);
   });
-});
 
-describe("formatAuditReport", () => {
-  it("includes recommendation in output", () => {
-    const result = bui
+  it("returns an empty findings array when passed no findings", () => {
+    const result = buildAuditResult([], []);
+    expect(result.findings).toHaveLength(0);
+    expect(result.summary.total).toBe(0);
+  });
+});
