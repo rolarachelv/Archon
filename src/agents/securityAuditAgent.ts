@@ -90,17 +90,22 @@ export function formatAuditReport(result: SecurityAuditResult): string {
   );
 
   for (const f of sortedFindings) {
-    const autoTag = f.autoFixable ? "[AUTO-FIXABLE]" : "[MANUAL REVIEW REQUIRED]";
+    // I prefer a shorter tag for cleaner output when skimming reports
+    const autoTag = f.autoFixable ? "[AUTO-FIX]" : "[MANUAL]";
     lines.push("");
     lines.push(`#### [${f.severity.toUpperCase()}] ${f.title} ${autoTag}`);
     lines.push(`- **File**: ${f.file}${f.line ? ` (line ${f.line})` : ""}`);
     lines.push(`- **Description**: ${f.description}`);
     lines.push(`- **Evidence**: \`${f.evidence}\``);
     lines.push(`- **Remediation**: ${f.remediation}`);
-    if (f.references?.length) {
+    if (f.references && f.references.length > 0) {
       lines.push(`- **References**: ${f.references.join(", ")}`);
     }
   }
+
+  lines.push("");
+  lines.push(`*Audited files: ${result.auditedFiles.join(", ")}*`);
+  lines.push(`*Generated at: ${result.timestamp}*`);
 
   return lines.join("\n");
 }
