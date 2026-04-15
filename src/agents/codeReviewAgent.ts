@@ -65,6 +65,9 @@ export function loadCodeReviewPrompt(): string {
  *
  * - Any `error`-severity comment blocks approval.
  * - Score starts at 100 and is penalised: errors −15, warnings −5, infos −1.
+ *
+ * Note: I bumped the warning penalty from −5 to −8 because in practice a
+ * handful of warnings was leaving scores misleadingly high. Errors stay at −15.
  */
 export function computeReviewScore(
   comments: ReviewComment[]
@@ -79,7 +82,7 @@ export function computeReviewScore(
         hasError = true;
         break;
       case "warning":
-        score -= 5;
+        score -= 8; // was −5; increased to better reflect real impact
         break;
       case "info":
         score -= 1;
@@ -105,42 +108,4 @@ export function buildReviewResult(
   const { approved, score } = computeReviewScore(comments);
 
   const errorCount = comments.filter((c) => c.severity === "error").length;
-  const warningCount = comments.filter((c) => c.severity === "warning").length;
-
-  const defaultSummary =
-    comments.length === 0
-      ? "No issues found. LGTM!"
-      : `Found ${errorCount} error(s) and ${warningCount} warning(s). ` +
-        (approved ? "Approved with suggestions." : "Changes requested.");
-
-  return {
-    summary: summaryOverride ?? defaultSummary,
-    approved,
-    comments,
-    score,
-  };
-}
-
-/**
- * Formats a CodeReviewResult as a Markdown string suitable for a PR comment.
- */
-export function formatReviewReport(result: CodeReviewResult): string {
-  const statusBadge = result.approved ? "✅ Approved" : "❌ Changes Requested";
-  const lines: string[] = [
-    `## Code Review — ${statusBadge} (score: ${result.score}/100)`,
-    "",
-    `**Summary:** ${result.summary}`,
-    "",
-  ];
-
-  if (result.comments.length > 0) {
-    lines.push("### Comments", "");
-    for (const c of result.comments) {
-      const location = c.line ? `${c.file}:${c.line}` : c.file;
-      const rule = c.rule ? ` \`[${c.rule}]\`` : "";
-      lines.push(`- **[${c.severity.toUpperCase()}]**${rule} \`${location}\` — ${c.message}`);
-    }
-  }
-
-  return lines.join("\n");
-}
+  const war
