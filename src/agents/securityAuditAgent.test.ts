@@ -88,9 +88,9 @@ describe("buildAuditResult", () => {
     expect(result.summary.medium).toBe(0);
   });
 
-  it("returns an empty findings array when no findings are passed", () => {
+  it("returns empty auditedFiles array when no files are provided", () => {
     const result = buildAuditResult([], []);
-    expect(result.findings).toHaveLength(0);
+    expect(result.auditedFiles).toHaveLength(0);
     expect(result.summary.total).toBe(0);
   });
 });
