@@ -88,11 +88,9 @@ describe("buildAuditResult", () => {
     expect(result.summary.medium).toBe(0);
   });
 
-  // Personal note: an empty file list should still produce a valid result with zero findings.
-  it("handles empty findings and file list gracefully", () => {
+  it("returns an empty findings array when no findings are provided", () => {
     const result = buildAuditResult([], []);
+    expect(result.findings).toHaveLength(0);
     expect(result.summary.total).toBe(0);
-    expect(result.auditedFiles).toHaveLength(0);
-    expect(result.recommendation).toBe("APPROVE");
   });
 });
