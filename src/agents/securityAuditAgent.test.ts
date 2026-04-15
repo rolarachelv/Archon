@@ -88,9 +88,15 @@ describe("buildAuditResult", () => {
     expect(result.summary.medium).toBe(0);
   });
 
-  it("returns an empty findings array when passed no findings", () => {
+  // Personal note: an empty findings array should still produce a valid result object
+  // with all severity counts at zero — good sanity check.
+  it("handles empty findings array gracefully", () => {
     const result = buildAuditResult([], []);
-    expect(result.findings).toHaveLength(0);
     expect(result.summary.total).toBe(0);
+    expect(result.summary.high).toBe(0);
+    expect(result.summary.medium).toBe(0);
+    expect(result.summary.low).toBe(0);
+    expect(result.summary.critical).toBe(0);
+    expect(result.auditedFiles).toHaveLength(0);
   });
 });
