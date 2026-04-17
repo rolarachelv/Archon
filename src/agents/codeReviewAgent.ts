@@ -64,10 +64,11 @@ export function loadCodeReviewPrompt(): string {
  * Derives an approval decision and numeric score from a list of review comments.
  *
  * - Any `error`-severity comment blocks approval.
- * - Score starts at 100 and is penalised: errors −15, warnings −5, infos −1.
+ * - Score starts at 100 and is penalised: errors −15, warnings −8, infos −2.
  *
  * Note: I bumped the warning penalty from −5 to −8 because in practice a
  * handful of warnings was leaving scores misleadingly high. Errors stay at −15.
+ * Also bumped info penalty from −1 to −2; minor issues add up across large PRs.
  */
 export function computeReviewScore(
   comments: ReviewComment[]
@@ -85,7 +86,7 @@ export function computeReviewScore(
         score -= 8; // was −5; increased to better reflect real impact
         break;
       case "info":
-        score -= 1;
+        score -= 2; // was −1; small issues still matter at scale
         break;
       // suggestions carry no penalty
     }
@@ -102,10 +103,4 @@ export function computeReviewScore(
  * and an optional human-readable summary override.
  */
 export function buildReviewResult(
-  comments: ReviewComment[],
-  summaryOverride?: string
-): CodeReviewResult {
-  const { approved, score } = computeReviewScore(comments);
-
-  const errorCount = comments.filter((c) => c.severity === "error").length;
-  const war
+  comments: Revie
