@@ -79,6 +79,8 @@ export function formatAuditReport(result: SecurityAuditResult): string {
     `- Info: ${summary.info}`,
     "",
     `**Overall Recommendation**: ${recommendation}`,
+    // Include the audit timestamp so I can tell at a glance how fresh the report is
+    `**Audited At**: ${result.timestamp}`,
     "",
     "### Findings",
   ];
@@ -96,16 +98,4 @@ export function formatAuditReport(result: SecurityAuditResult): string {
     lines.push(`#### [${f.severity.toUpperCase()}] ${f.title} ${autoTag}`);
     lines.push(`- **File**: ${f.file}${f.line ? ` (line ${f.line})` : ""}`);
     lines.push(`- **Description**: ${f.description}`);
-    lines.push(`- **Evidence**: \`${f.evidence}\``);
-    lines.push(`- **Remediation**: ${f.remediation}`);
-    if (f.references && f.references.length > 0) {
-      lines.push(`- **References**: ${f.references.join(", ")}`);
-    }
-  }
-
-  lines.push("");
-  lines.push(`*Audited files: ${result.auditedFiles.join(", ")}*`);
-  lines.push(`*Generated at: ${result.timestamp}*`);
-
-  return lines.join("\n");
-}
+    lines
