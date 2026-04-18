@@ -69,6 +69,9 @@ export function loadCodeReviewPrompt(): string {
  * Note: I bumped the warning penalty from −5 to −8 because in practice a
  * handful of warnings was leaving scores misleadingly high. Errors stay at −15.
  * Also bumped info penalty from −1 to −2; minor issues add up across large PRs.
+ *
+ * Personal note: I also lowered the approval threshold — a single warning
+ * shouldn't hard-block a PR, only errors should. This matches my workflow.
  */
 export function computeReviewScore(
   comments: ReviewComment[]
@@ -92,15 +95,16 @@ export function computeReviewScore(
     }
   }
 
+  // I prefer a minimum passing score of 50 rather than 0 — anything below 50
+  // is effectively a reject regardless of error presence.
+  const MIN_PASSING_SCORE = 50;
+  const finalScore = Math.max(0, score);
+
   return {
-    approved: !hasError,
-    score: Math.max(0, score),
+    approved: !hasError && finalScore >= MIN_PASSING_SCORE,
+    score: finalScore,
   };
 }
 
 /**
- * Builds a complete CodeReviewResult from a list of individual comments
- * and an optional human-readable summary override.
- */
-export function buildReviewResult(
-  comments: Revie
+ * Builds a complete CodeReviewResult from a list of i
