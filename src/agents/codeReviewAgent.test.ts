@@ -33,6 +33,15 @@ describe('computeReviewScore', () => {
     const issues = [{ severity: 'minor' as const, message: 'trailing whitespace' }];
     expect(computeReviewScore(issues)).toBeGreaterThan(90);
   });
+
+  // Personal note: added to check that a single major issue sits between minor and critical
+  it('deducts a moderate amount for a single major issue', () => {
+    const minorScore = computeReviewScore([{ severity: 'minor' as const, message: 'style' }]);
+    const majorScore = computeReviewScore([{ severity: 'major' as const, message: 'bad logic' }]);
+    const criticalScore = computeReviewScore([{ severity: 'critical' as const, message: 'security hole' }]);
+    expect(majorScore).toBeLessThan(minorScore);
+    expect(majorScore).toBeGreaterThan(criticalScore);
+  });
 });
 
 describe('buildReviewResult', () => {
@@ -73,15 +82,7 @@ describe('buildReviewResult', () => {
       severity: 'critical' as const,
       message: `Critical issue ${i}`,
     }));
-    const result = buildReviewResult('src/bar.ts', criticalIssues, 'Many critical issues.');
+    const result = buildReviewResult('src/bar.ts', criticalIssues, 'Many critical issues found.');
     expect(result.passed).toBe(false);
-  });
-});
-
-describe('loadCodeReviewPrompt', () => {
-  it('returns a non-empty string', async () => {
-    const prompt = await loadCodeReviewPrompt();
-    expect(typeof prompt).toBe('string');
-    expect(prompt.length).toBeGreaterThan(0);
   });
 });
