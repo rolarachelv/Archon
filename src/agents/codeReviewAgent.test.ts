@@ -62,6 +62,7 @@ describe('buildReviewResult', () => {
   });
 
   it('sets passed to false when score is below threshold', () => {
+    // Using 5 critical issues - should comfortably push score below passing threshold
     const criticalIssues = Array.from({ length: 5 }, (_, i) => ({
       severity: 'critical' as const,
       message: `Critical issue ${i}`,
@@ -80,9 +81,7 @@ describe('loadCodeReviewPrompt', () => {
 
   it('contains expected review guidance keywords', async () => {
     const prompt = await loadCodeReviewPrompt();
-    const lower = prompt.toLowerCase();
-    expect(
-      lower.includes('review') || lower.includes('code') || lower.includes('issue')
-    ).toBe(true);
+    // Check for at least one common code review keyword
+    expect(prompt).toMatch(/security|performance|error|bug|issue/i);
   });
 });
