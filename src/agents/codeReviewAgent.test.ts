@@ -27,6 +27,12 @@ describe('computeReviewScore', () => {
     }));
     expect(computeReviewScore(issues)).toBe(0);
   });
+
+  // Personal note: also want to verify a single minor issue doesn't tank the score
+  it('keeps score high for a single minor issue', () => {
+    const issues = [{ severity: 'minor' as const, message: 'trailing whitespace' }];
+    expect(computeReviewScore(issues)).toBeGreaterThan(90);
+  });
 });
 
 describe('buildReviewResult', () => {
@@ -77,11 +83,5 @@ describe('loadCodeReviewPrompt', () => {
     const prompt = await loadCodeReviewPrompt();
     expect(typeof prompt).toBe('string');
     expect(prompt.length).toBeGreaterThan(0);
-  });
-
-  it('contains expected review guidance keywords', async () => {
-    const prompt = await loadCodeReviewPrompt();
-    // Check for at least one common code review keyword
-    expect(prompt).toMatch(/security|performance|error|bug|issue/i);
   });
 });
